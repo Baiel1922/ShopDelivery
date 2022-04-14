@@ -10,7 +10,7 @@ def send_activation_code(email, activation_code):
     send_mail(
         "Activate your account",
         messege,
-        "Abdyllaevbaiel.00@gmail.com",
+        "baielabdyllaev.00@gmail.com",
         [email, ],
-        fail_silently=False
+        fail_silently=False,
     )
