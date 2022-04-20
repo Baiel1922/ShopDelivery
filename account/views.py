@@ -36,3 +36,12 @@ class LogoutView(APIView):
         Token.objects.filter(user=user).delete()
         return Response("Successfully signed out", status=status.HTTP_200_OK)
 
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated, ]
+
+    def post(self, request):
+        data = request.data
+        serializer = ChangePasswordSerializer(data=data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.set_new_password()
+        return Response('Password successfully changed!')
