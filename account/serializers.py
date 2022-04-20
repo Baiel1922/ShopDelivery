@@ -32,12 +32,12 @@ class ActivationSerializer(serializers.Serializer):
 
     def validate_email(self, email):
         if not MyUser.objects.filter(email=email).exists():
-            raise serializers.ValidationError('Пользователь не зарегистрирован')
+            raise serializers.ValidationError('User is not found')
         return email
 
     def validate_code(self, code):
         if not MyUser.objects.filter(activation_code=code).exists():
-            raise serializers.ValidationError('Активационный код не найден!')
+            raise serializers.ValidationError('Activation code not found')
         return code
 
 
@@ -45,7 +45,7 @@ class ActivationSerializer(serializers.Serializer):
         email = attrs.get('email')
         code = attrs.get('activation_code')
         if not MyUser.objects.filter(email=email, activation_code=code).exists():
-            raise serializers.ValidationError('Активационный код не найден')
+            raise serializers.ValidationError('Activation code not found')
         return attrs
 
     def activate(self):
@@ -79,3 +79,28 @@ class LoginSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, min_length=6)
+    new_password_confirm = serializers.CharField(required=True, min_length=6)
+
+    def validate_old_password(self, old_password):
+        user = self.context.get("request").user
+        if not user.check_password(old_password):
+            raise serializers.ValidationError("Incorrect password")
+        return old_password
+
+    def validate(self, attrs):
+        new_password = attrs.get("new_password")
+        new_password_confirm = attrs.get("new_password_confirm")
+
+        if new_password != new_password_confirm:
+            raise serializers.ValidationError("Passwords do not match")
+        return attrs
+
+    def set_new_password(self):
+        user = self.context.get('request').user
+        password = self.validated_data.get('new_password')
+        user.set_password(password)
+        user.save()
