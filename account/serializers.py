@@ -104,3 +104,49 @@ class ChangePasswordSerializer(serializers.Serializer):
         password = self.validated_data.get('new_password')
         user.set_password(password)
         user.save()
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    def validate_email(self, email):
+        if not MyUser.objects.filter(email=email):
+            raise serializers.ValidationError('Пользователь не найден')
+        return email
+
+    def send_code(self):
+        email = self.validated_data.get('email')
+        user = MyUser.objects.get(email=email)
+        user.create_activation_code()
+        send_activation_code(email=user.email, activation_code=user.activation_code)
+
+class ForgetPasswordCompleteSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(min_length=6, required=True)
+    password_confirm = serializers.CharField(min_length=6, required=True)
+    activation_code = serializers.CharField(min_length=6, required=True)
+
+    def validate_email(self, email):
+        if not MyUser.objects.filter(email=email).exists():
+            raise serializers.ValidationError('Пользователь не зарегистрирован')
+        return email
+
+    def validate(self, attrs):
+        password = attrs.get('password')
+        password_confirm = attrs.get('password_confirm')
+
+        if password != password_confirm:
+            raise serializers.ValidationError('Пароли не совпадают')
+
+        code = attrs.get('activation_code')
+        if not MyUser.objects.filter(activation_code=code).exists():
+            raise serializers.ValidationError('Неверный активационный код')
+        return attrs
+
+    def set_new_password(self):
+        email = self.validated_data.get('email')
+        password = self.validated_data.get('password')
+        user = MyUser.objects.get(email=email)
+        user.set_password(password)
+        user.activation_code = ''
+        user.save()
+
