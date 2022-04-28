@@ -45,3 +45,19 @@ class ChangePasswordView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.set_new_password()
         return Response('Password successfully changed!')
+
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        data = request.data
+        serializer = ForgotPasswordSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.send_code()
+        return Response('Вам отправлено письмо для востановления пароля')
+
+class ForgetCompletePasswordView(APIView):
+    def post(self, request):
+        data = request.data
+        serializer = ForgetPasswordCompleteSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.set_new_password()
+        return Response("Пароль успешно изменен!")
