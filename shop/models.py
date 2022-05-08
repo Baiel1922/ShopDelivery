@@ -8,8 +8,8 @@ class Category(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'Категория'
-        verbose_name_plural = 'Категории'
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
 
 
 class Shop(models.Model):
@@ -25,7 +25,7 @@ class Shop(models.Model):
         return self.name
 
 class Product(models.Model):
-    CHOICES = (('status', 'in stock'),('status', 'out of stock'))
+    CHOICES = (('in stock', 'in stock'),('out of stock', 'out of stock'))
     author = models.ForeignKey(MyUser, on_delete=models.CASCADE, verbose_name='products',
                                related_name='products')
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='products',
@@ -34,7 +34,7 @@ class Product(models.Model):
     description = models.TextField(verbose_name='Description')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='shops',
                                  verbose_name='Category')
-    status = models.CharField(max_length=50, choices=CHOICES, default='new')
+    status = models.CharField(max_length=50, choices=CHOICES)
     image = models.ImageField(upload_to='media/product_images', verbose_name='Image')
     price = models.PositiveIntegerField(blank=False)
 
@@ -45,3 +45,31 @@ class Product(models.Model):
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
 
+class RatingStar(models.Model):
+    value = models.SmallIntegerField(primary_key=True, unique=True, default=0)
+
+    def __str__(self):
+        return f'{self.value}'
+
+    class Meta:
+        verbose_name = "Rating star"
+        verbose_name_plural = "Rating stars"
+
+class Rating(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='ratings')
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='ratings')
+    star = models.ForeignKey(RatingStar, on_delete=models.CASCADE, related_name='ratings')
+
+    def __str__(self):
+        return f'{self.product} - {self.star}'
+
+    class Meta:
+        verbose_name = 'Rating'
+        verbose_name_plural = 'Ratings'
+
+class Saved(models.Model):
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='saved')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='saved')
+
+    def __str__(self):
+        return f'{self.author} - {self.survey}'
