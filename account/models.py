@@ -54,3 +54,19 @@ class MyUser(AbstractBaseUser):
         self.activation_code = code
         self.save()
         return code
+
+class InfoUser(models.Model):
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, verbose_name='Author')
+    name = models.CharField(max_length=50, verbose_name='Name')
+    surname = models.CharField(max_length=55, verbose_name='Surname')
+    phone = models.CharField(max_length=20, verbose_name='Phone number')
+    image = models.ImageField(upload_to='media/images_of_users', blank=True, null=True,
+                              verbose_name='Image')
+
+    def __str__(self):
+        return f'{self.surname} {self.name}'
+
+    class Meta:
+        verbose_name = 'Info user'
+        verbose_name_plural = 'Info users'
+
