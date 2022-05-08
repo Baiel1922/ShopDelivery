@@ -70,3 +70,4 @@ class InfoUser(models.Model):
         verbose_name = 'Info user'
         verbose_name_plural = 'Info users'
 
+
