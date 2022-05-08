@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -61,3 +61,8 @@ class ForgetCompletePasswordView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.set_new_password()
         return Response("Пароль успешно изменен!")
+
+class InfoUserView(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, ]
+    queryset = InfoUser.objects.all()
+    serializer_class = InfoUserSerializer

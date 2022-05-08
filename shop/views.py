@@ -32,3 +32,4 @@ class ProductView(PermissionMixin, viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     pagination_class = LargeResultPagination
+

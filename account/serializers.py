@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-
-from .models import MyUser
+from rest_framework.fields import ReadOnlyField
+from .models import MyUser, InfoUser
 from .utils import send_activation_code
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -150,3 +150,23 @@ class ForgetPasswordCompleteSerializer(serializers.Serializer):
         user.activation_code = ''
         user.save()
 
+class InfoUserSerializer(serializers.ModelSerializer):
+    author = ReadOnlyField(source='author.email')
+
+    class Meta:
+        model = InfoUser
+        fields = '__all__'
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user
+        info, _ = InfoUser.objects.update_or_create(
+            author=user,
+            defaults={'name': validated_data.get('name'),
+                      'surname': validated_data.get('surname'),
+                      'phone': validated_data.get('phone'),
+                      'image': validated_data.get('image')
+                      }
+        )
+
+        return info
