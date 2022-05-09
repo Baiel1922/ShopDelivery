@@ -72,4 +72,4 @@ class Saved(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='saved')
 
     def __str__(self):
-        return f'{self.author} - {self.survey}'
+        return f'{self.author} - {self.product}'

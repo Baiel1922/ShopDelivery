@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'account',
     'shop',
     'drf_yasg',
+    'django_filters',
 
 ]
 
@@ -132,7 +133,9 @@ STATIC_URL = '/static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.TokenAuthentication', ]
+    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.TokenAuthentication', ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': "rest_framework.pagination.LimitOffsetPagination",
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
