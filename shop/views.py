@@ -3,9 +3,9 @@ from .serializers import *
 from .models import *
 from account.permissions import IsAuthorPermission, IsActivePermission
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, filters
 from .service import LargeResultPagination
-
+from django_filters.rest_framework import DjangoFilterBackend
 class PermissionMixin:
     def get_permissions(self):
         if self.action == "create":
@@ -35,12 +35,19 @@ class ShopView(PermissionMixin, viewsets.ModelViewSet):
     queryset = Shop.objects.all()
     serializer_class = ShopSerializer
     pagination_class = LargeResultPagination
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', ]
+    ordering_fields = '__all__'
 
 
 class ProductView(PermissionMixin, viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     pagination_class = LargeResultPagination
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter]
+    search_fields = ['name', 'description']
+    filterset_fields = ['category', 'shop']
+    ordering_fields = '__all__'
 
 class AddRatingViewSet(PermissionMixin2,viewsets.ModelViewSet):
     queryset = Rating.objects.all()
